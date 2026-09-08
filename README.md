@@ -8,14 +8,13 @@ query performance.
 
 ## Why this project
 
-Most portfolio projects are CRUD apps. This one demonstrates something
-rarer and more senior: understanding *how a database actually executes a
-query*, not just how to write one. It combines:
-- Parsing and normalizing a semi-structured, version-dependent JSON format
-- A rule-based analysis engine (the same category of logic behind real
-  tools like `pt-query-digest` or Postgres's `pganalyze`)
-- A clean API + UI that turns a wall of JSON into something a developer
-  can act on in seconds
+I wanted to build a project that helps understand how a database executes a SQL query and how query performance can be improved. MySQL provides execution plans through EXPLAIN FORMAT=JSON, but the output can be difficult to read. This project parses that output and identifies common performance issues.
+
+It combines:
+
+Parsing the JSON execution plan and converting it into a readable tree
+Rule-based checks for common query performance issues
+A FastAPI backend and simple frontend for analyzing queries and displaying the results
 
 ## Architecture
 
