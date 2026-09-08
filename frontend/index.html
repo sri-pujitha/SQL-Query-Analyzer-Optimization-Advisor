@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL Query Optimizer</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>SQL Query Optimizer</h1>
+    <p class="subtitle">Paste a query, see its execution plan, get concrete index suggestions.</p>
+  </header>
+
+  <main>
+    <section class="panel" id="connection-panel">
+      <h2>1. Connection</h2>
+      <div class="conn-grid">
+        <label>Host<input id="host" value="127.0.0.1"></label>
+        <label>Port<input id="port" value="3306"></label>
+        <label>User<input id="user" placeholder="root"></label>
+        <label>Password<input id="password" type="password"></label>
+        <label>Database<input id="database" placeholder="my_schema"></label>
+      </div>
+      <button id="test-conn-btn">Test Connection</button>
+      <span id="conn-status"></span>
+    </section>
+
+    <section class="panel" id="query-panel">
+      <h2>2. Query</h2>
+      <textarea id="query" placeholder="SELECT * FROM orders WHERE customer_id = 42;"></textarea>
+      <button id="analyze-btn">Analyze Query</button>
+      <span id="analyze-status"></span>
+    </section>
+
+    <section class="panel" id="results-panel" hidden>
+      <h2>3. Execution Plan</h2>
+      <div id="plan-tree"></div>
+
+      <h2>4. Findings &amp; Suggestions</h2>
+      <div id="findings-list"></div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
