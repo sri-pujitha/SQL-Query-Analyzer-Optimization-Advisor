@@ -1,9 +1,10 @@
 # SQL Query Optimizer
 
-A tool that runs `EXPLAIN FORMAT=JSON` on a MySQL query, renders the
-execution plan as a readable tree, and flags common performance problems
-(full table scans, filesorts, temporary tables, unused indexes) with
-concrete suggestions - the kind of review an experienced DBA does by eye.
+A tool that runs EXPLAIN FORMAT=JSON on a MySQL query, displays the 
+execution plan as a readable tree, and identifies common performance 
+issues such as full table scans, filesorts, temporary tables, 
+and unused indexes. It also provides suggestions to help improve
+query performance.
 
 ## Why this project
 
