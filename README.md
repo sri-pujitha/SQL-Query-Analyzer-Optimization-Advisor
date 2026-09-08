@@ -19,7 +19,7 @@ It combines:
 ## Architecture
 
 ```
-┌─────────────┐      POST /api/analyze      ┌──────────────────┐
+┌─────────────┐      POST /api/analyze       ┌──────────────────┐
 │  Frontend   │ ───────────────────────────▶ │  FastAPI backend │
 │ (HTML/JS)   │ ◀─────────────────────────── │                  │
 └─────────────┘      plan tree + findings    └────────┬─────────┘
@@ -30,18 +30,11 @@ It combines:
                                               └──────────────────┘
 ```
 
-- **`backend/db.py`** — opens a short-lived MySQL connection per request
-  (credentials are never stored) and runs `EXPLAIN FORMAT=JSON`.
-- **`backend/explain_parser.py`** — MySQL's JSON plan shape varies a lot
-  depending on the query (joins, subqueries, unions, sorts). This module
-  walks it recursively and normalizes it into one consistent tree shape.
-- **`backend/rules.py`** — the analysis engine. Walks the normalized tree
-  and applies heuristics: full scans, unused indexes, filesorts, temp
-  tables, low filter selectivity — each with a severity and a suggested
-  fix, including generated `CREATE INDEX` statements where possible.
-- **`backend/main.py`** — FastAPI app exposing `/api/connect-test` and
-  `/api/analyze`, and serving the frontend as static files.
-- **`frontend/`** — vanilla HTML/CSS/JS. No build step required.
+- **backend/db.py** — Connects to MySQL and runs EXPLAIN FORMAT=JSON for the query.
+- **backend/explain_parser.py** — Parses the JSON execution plan and converts it into a readable tree structure.
+- **backend/rules.py** — Checks the execution plan for common issues such as full table scans, filesorts, temporary tables, unused indexes, and low filter selectivity. It also provides suggestions for improving the query.
+- **backend/main.py** — Contains the FastAPI application and provides the /api/connect-test and /api/analyze endpoints. It also serves the frontend.
+- **frontend/** — Contains the HTML, CSS, and JavaScript files used for the user interface.
 
 ## Setup
 
@@ -84,29 +77,17 @@ Query**.
 SELECT * FROM orders WHERE customer_id = 42;
 ```
 
-Against the sample schema, this should be flagged as a **full table scan**
-with a suggested `CREATE INDEX` statement. Run that statement, re-analyze
-the same query, and watch the finding disappear — a nice before/after to
-show in an interview or demo video.
+Against the sample schema, this should be flagged as a full table scan with a suggested CREATE INDEX statement. Run the suggested statement and analyze the same query again to see if the issue is resolved.
 
 ## Design decisions & trade-offs
 
-- **`EXPLAIN FORMAT=JSON` over `EXPLAIN ANALYZE`** — plain `EXPLAIN` uses
-  the optimizer's *estimates*, not actual execution stats, which means it's
-  safe to run even on write-heavy production tables without side effects.
-  `EXPLAIN ANALYZE` (which actually runs the query) was left as a natural
-  "v2" extension.
-- **SELECT-only restriction** — the API rejects anything that isn't a
-  `SELECT`, since this tool is for *analyzing* queries, not running
-  arbitrary SQL against a user's database.
-- **Heuristic rules, not a query planner** — the goal is surfacing the same
-  red flags a human reviewer would notice, not perfectly replicating
-  MySQL's cost model.
+- **`EXPLAIN FORMAT=JSON` over `EXPLAIN ANALYZE`** — The project uses EXPLAIN FORMAT=JSON to get the query execution plan without actually executing the query. EXPLAIN ANALYZE could be added in a future version to compare estimated and actual execution details.
+- **SELECT-only restriction** — The API only accepts SELECT queries because the purpose of the project is to analyze queries rather than execute other types of SQL statements.
+- **Heuristic rules, not a query planner** — The project uses rule-based checks to identify common performance issues. It does not try to replace MySQL's query optimizer or cost model.
 
-## Possible extensions (good "what I'd do next" talking points)
+## Possible extensions
 
-- Support `EXPLAIN ANALYZE FORMAT=JSON` for actual vs. estimated row counts
+- Support EXPLAIN ANALYZE FORMAT=JSON to compare estimated and actual row counts
 - Add PostgreSQL support alongside MySQL
-- Track query history and diff plans before/after an index change
-- Auto-apply suggested indexes to a scratch/staging copy and re-run EXPLAIN
-  to quantify the improvement
+- Track query history and compare execution plans before and after an index change
+- Apply suggested indexes to a test database and re-run EXPLAIN to measure the improvement
