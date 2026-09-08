@@ -12,9 +12,9 @@ I wanted to build a project that helps understand how a database executes a SQL 
 
 It combines:
 
-Parsing the JSON execution plan and converting it into a readable tree
-Rule-based checks for common query performance issues
-A FastAPI backend and simple frontend for analyzing queries and displaying the results
+- Parsing the JSON execution plan and converting it into a readable tree
+- Rule-based checks for common query performance issues
+- A FastAPI backend and simple frontend for analyzing queries and displaying the results
 
 ## Architecture
 
